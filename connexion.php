@@ -1,6 +1,6 @@
 <?php
 $serveur = "localhost";
-$base = "boutique_php";
+$base = "boutique_web_php";
 $utilisateur = "root";
 $motdepasse = "";
 

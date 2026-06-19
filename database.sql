@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS boutique_php;
-CREATE DATABASE boutique_php CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE boutique_php;
+DROP DATABASE IF EXISTS boutique_web_php;
+CREATE DATABASE boutique_web_php CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE boutique_web_php;
 
 CREATE TABLE utilisateur (
     id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,

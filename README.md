@@ -37,7 +37,7 @@ Il n'y a pas de JavaScript et pas de framework. Le projet reste volontairement s
 5. Ouvrir le site :
 
 ```text
-http://localhost/boutique_php/
+http://localhost/boutique_web_php/
 ```
 
 Selon le nom du dossier, l'URL peut changer. Par exemple :
@@ -83,3 +83,8 @@ images/            images des produits
 ## Remarque
 
 Le paiement est simule. Le projet sert surtout a montrer la logique d'une boutique : utilisateur, produits, panier, commandes et administration simple.
+
+
+## Base de données
+
+Le fichier `database.sql` crée une base appelée `boutique_web_php`. Le fichier `connexion.php` utilise le même nom de base.
