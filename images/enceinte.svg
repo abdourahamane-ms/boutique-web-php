@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="650" viewBox="0 0 900 650">
-  <rect width="900" height="650" rx="46" fill="#fff7ed"/>
-  <circle cx="735" cy="120" r="120" fill="#be123c" opacity="0.15"/>
-  <circle cx="160" cy="520" r="150" fill="#be123c" opacity="0.10"/>
-  <rect x="120" y="145" width="660" height="360" rx="38" fill="white" stroke="#ead9bf" stroke-width="8"/>
-  <rect x="170" y="210" width="560" height="210" rx="28" fill="#be123c" opacity="0.12"/>
-  <text x="450" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="900" fill="#be123c">BT</text>
-  <text x="450" y="455" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="800" fill="#1f2933">Enceinte Mini</text>
-</svg>

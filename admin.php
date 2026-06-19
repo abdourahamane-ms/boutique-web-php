@@ -1,188 +1,169 @@
 <?php
-require_once 'connexion.php';
+require_once "auth_check.php";
+require_once "connexion.php";
 
-if (!admin_connecte()) {
-    header('Location: login.php');
+if (!isset($_SESSION["user_role"]) || $_SESSION["user_role"] !== "admin") {
+    $_SESSION["message"] = "Acces reserve a l'administrateur.";
+    header("Location: index.php");
     exit;
 }
 
-$message = '';
+$erreur = "";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $action = isset($_POST['action']) ? $_POST['action'] : '';
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["ajouter_produit"])) {
+    $nom = trim($_POST["nom"]);
+    $description = trim($_POST["description"]);
+    $prix = (float) $_POST["prix"];
+    $stock = (int) $_POST["stock"];
+    $image = trim($_POST["image"]);
 
-    if ($action == 'ajouter_produit') {
-        $nom = trim($_POST['nom']);
-        $description = trim($_POST['description']);
-        $prix = floatval($_POST['prix']);
-        $stock = intval($_POST['stock']);
-        $categorie = intval($_POST['id_categorie']);
-
-        if ($nom != '' && $prix > 0 && $stock >= 0) {
-            $requete = $pdo->prepare("INSERT INTO produit(nom, description, prix, stock, image, id_categorie, actif)
-                                     VALUES (?, ?, ?, ?, 'images/produit-defaut.svg', ?, 1)");
-            $requete->execute(array($nom, $description, $prix, $stock, $categorie));
-            $message = 'Produit ajouté au catalogue.';
-        } else {
-            $message = 'Le nom, le prix ou le stock est incorrect.';
-        }
-    }
-
-    if ($action == 'changer_stock') {
-        $id_produit = intval($_POST['id_produit']);
-        $stock = intval($_POST['stock']);
-
-        if ($stock >= 0) {
-            $requete = $pdo->prepare("UPDATE produit SET stock = ? WHERE id_produit = ?");
-            $requete->execute(array($stock, $id_produit));
-            $message = 'Stock mis à jour.';
-        }
-    }
-
-    if ($action == 'masquer_produit') {
-        $id_produit = intval($_POST['id_produit']);
-        $requete = $pdo->prepare("UPDATE produit SET actif = 0 WHERE id_produit = ?");
-        $requete->execute(array($id_produit));
-        $message = 'Produit masqué du catalogue.';
-    }
-
-    if ($action == 'changer_statut') {
-        $id_commande = intval($_POST['id_commande']);
-        $statut = $_POST['statut'];
-        $requete = $pdo->prepare("UPDATE commande SET statut = ? WHERE id_commande = ?");
-        $requete->execute(array($statut, $id_commande));
-        $message = 'Statut de commande mis à jour.';
+    if ($nom === "" || $description === "" || $prix <= 0 || $stock < 0) {
+        $erreur = "Veuillez remplir correctement les informations du produit.";
+    } else {
+        $requete = $pdo->prepare("INSERT INTO produit (nom, description, prix, image, stock) VALUES (?, ?, ?, ?, ?)");
+        $requete->execute([$nom, $description, $prix, $image, $stock]);
+        $_SESSION["message"] = "Produit ajoute avec succes.";
+        header("Location: admin.php");
+        exit;
     }
 }
 
-$categories = $pdo->query("SELECT * FROM categorie ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["modifier_stock"])) {
+    $idProduit = (int) $_POST["id_produit"];
+    $stock = (int) $_POST["stock"];
 
-$produits = $pdo->query("SELECT produit.*, categorie.nom AS nom_categorie
-                         FROM produit
-                         LEFT JOIN categorie ON produit.id_categorie = categorie.id_categorie
-                         ORDER BY produit.actif DESC, produit.nom ASC")->fetchAll(PDO::FETCH_ASSOC);
+    if ($stock >= 0) {
+        $requete = $pdo->prepare("UPDATE produit SET stock = ? WHERE id_produit = ?");
+        $requete->execute([$stock, $idProduit]);
+        $_SESSION["message"] = "Stock mis a jour.";
+    }
 
-$commandes = $pdo->query("SELECT commande.*, utilisateur.nom AS nom_client
-                          FROM commande
-                          LEFT JOIN utilisateur ON commande.id_utilisateur = utilisateur.id_utilisateur
-                          ORDER BY commande.date_commande DESC")->fetchAll(PDO::FETCH_ASSOC);
+    header("Location: admin.php");
+    exit;
+}
 
-require_once 'header.php';
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["supprimer_produit"])) {
+    $idProduit = (int) $_POST["id_produit"];
+
+    $requete = $pdo->prepare("DELETE FROM produit WHERE id_produit = ?");
+    $requete->execute([$idProduit]);
+
+    $_SESSION["message"] = "Produit supprime.";
+    header("Location: admin.php");
+    exit;
+}
+
+$produits = $pdo->query("SELECT * FROM produit ORDER BY id_produit DESC")->fetchAll();
+$commandes = $pdo->query("SELECT commande.*, utilisateur.nom AS nom_client FROM commande INNER JOIN utilisateur ON commande.id_utilisateur = utilisateur.id_utilisateur ORDER BY date_commande DESC")->fetchAll();
+
+require_once "header.php";
 ?>
-
-<section class="bloc">
-    <div class="ligne-titre">
-        <div>
-            <p class="petit-titre">Gestion simple</p>
-            <h1>Administration</h1>
-        </div>
-        <a class="bouton-secondaire" href="index.php">Voir la boutique</a>
-    </div>
-
-    <p>J'ai volontairement gardé une seule page d'administration pour que le projet reste facile à comprendre.</p>
-
-    <?php if ($message != '') { ?>
-        <p class="message-simple"><?php echo proteger($message); ?></p>
-    <?php } ?>
+<section class="section-title">
+    <h1>Espace administrateur</h1>
+    <p>Gestion simple des produits et consultation des commandes.</p>
 </section>
 
-<section class="deux-colonnes">
-    <div class="bloc">
-        <h2>Ajouter un produit</h2>
+<?php if ($erreur !== ""): ?>
+    <div class="erreur"><?= htmlspecialchars($erreur) ?></div>
+<?php endif; ?>
 
-        <form method="post" class="formulaire-simple">
-            <input type="hidden" name="action" value="ajouter_produit">
+<section class="admin-grille">
+    <div class="table-card">
+        <h2>Ajouter un produit</h2>
+        <form method="POST" class="form">
+            <input type="hidden" name="ajouter_produit" value="1">
 
             <label>Nom du produit</label>
             <input type="text" name="nom" required>
 
             <label>Description</label>
-            <textarea name="description" rows="4"></textarea>
+            <textarea name="description" rows="4" required></textarea>
 
             <label>Prix</label>
             <input type="number" step="0.01" name="prix" required>
 
             <label>Stock</label>
-            <input type="number" name="stock" value="1" required>
+            <input type="number" name="stock" required>
 
-            <label>Catégorie</label>
-            <select name="id_categorie">
-                <?php foreach ($categories as $cat) { ?>
-                    <option value="<?php echo $cat['id_categorie']; ?>"><?php echo proteger($cat['nom']); ?></option>
-                <?php } ?>
-            </select>
+            <label>Image</label>
+            <input type="text" name="image" placeholder="images/nom-image.jpg">
 
             <button type="submit">Ajouter le produit</button>
         </form>
     </div>
 
-    <div class="bloc">
-        <h2>Commandes</h2>
-
-        <?php if (empty($commandes)) { ?>
-            <p>Aucune commande pour le moment.</p>
-        <?php } ?>
-
-        <?php foreach ($commandes as $commande) { ?>
-            <form method="post" class="ligne-admin">
-                <input type="hidden" name="action" value="changer_statut">
-                <input type="hidden" name="id_commande" value="<?php echo $commande['id_commande']; ?>">
-
-                <span>#<?php echo $commande['id_commande']; ?> - <?php echo proteger($commande['nom_client']); ?> - <?php echo afficher_prix($commande['total']); ?></span>
-
-                <select name="statut">
-                    <option <?php if ($commande['statut'] == 'En préparation') echo 'selected'; ?>>En préparation</option>
-                    <option <?php if ($commande['statut'] == 'Envoyée') echo 'selected'; ?>>Envoyée</option>
-                    <option <?php if ($commande['statut'] == 'Terminée') echo 'selected'; ?>>Terminée</option>
-                </select>
-
-                <button type="submit">OK</button>
-            </form>
-        <?php } ?>
+    <div class="table-card">
+        <h2>Resume</h2>
+        <p><strong><?= count($produits) ?></strong> produits dans la boutique.</p>
+        <p><strong><?= count($commandes) ?></strong> commandes enregistrees.</p>
+        <p>Cette page reste volontairement simple pour pouvoir etre expliquee facilement.</p>
     </div>
 </section>
 
-<section class="bloc">
-    <h2>Produits du catalogue</h2>
-
-    <table class="tableau">
-        <tr>
-            <th>Nom</th>
-            <th>Catégorie</th>
-            <th>Prix</th>
-            <th>Stock</th>
-            <th>Action</th>
-        </tr>
-        <?php foreach ($produits as $produit) { ?>
+<section class="table-card admin-section">
+    <h2>Produits</h2>
+    <table>
+        <thead>
             <tr>
-                <td>
-                    <?php echo proteger($produit['nom']); ?>
-                    <?php if ($produit['actif'] == 0) { ?>
-                        <span class="stock-vide">Masqué</span>
-                    <?php } ?>
-                </td>
-                <td><?php echo proteger($produit['nom_categorie']); ?></td>
-                <td><?php echo afficher_prix($produit['prix']); ?></td>
-                <td>
-                    <form method="post" class="formulaire-ligne">
-                        <input type="hidden" name="action" value="changer_stock">
-                        <input type="hidden" name="id_produit" value="<?php echo $produit['id_produit']; ?>">
-                        <input type="number" name="stock" min="0" value="<?php echo $produit['stock']; ?>">
-                        <button type="submit">OK</button>
-                    </form>
-                </td>
-                <td>
-                    <?php if ($produit['actif'] == 1) { ?>
-                        <form method="post">
-                            <input type="hidden" name="action" value="masquer_produit">
-                            <input type="hidden" name="id_produit" value="<?php echo $produit['id_produit']; ?>">
-                            <button class="bouton-danger" type="submit">Masquer</button>
-                        </form>
-                    <?php } ?>
-                </td>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Stock</th>
+                <th>Actions</th>
             </tr>
-        <?php } ?>
+        </thead>
+        <tbody>
+            <?php foreach ($produits as $produit): ?>
+                <tr>
+                    <td><?= htmlspecialchars($produit["nom"]) ?></td>
+                    <td><?= number_format($produit["prix"], 2, ',', ' ') ?> EUR</td>
+                    <td>
+                        <form method="POST" class="form-admin-ligne">
+                            <input type="hidden" name="modifier_stock" value="1">
+                            <input type="hidden" name="id_produit" value="<?= $produit["id_produit"] ?>">
+                            <input type="number" name="stock" value="<?= $produit["stock"] ?>" min="0">
+                            <button type="submit">OK</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="supprimer_produit" value="1">
+                            <input type="hidden" name="id_produit" value="<?= $produit["id_produit"] ?>">
+                            <button type="submit" class="btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
 </section>
 
-<?php require_once 'footer.php'; ?>
+<section class="table-card admin-section">
+    <h2>Dernieres commandes</h2>
+    <?php if (empty($commandes)): ?>
+        <p>Aucune commande pour le moment.</p>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Numero</th>
+                    <th>Client</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Livraison</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($commandes as $commande): ?>
+                    <tr>
+                        <td>#<?= $commande["id_commande"] ?></td>
+                        <td><?= htmlspecialchars($commande["nom_client"]) ?></td>
+                        <td><?= htmlspecialchars($commande["date_commande"]) ?></td>
+                        <td><?= number_format($commande["total"], 2, ',', ' ') ?> EUR</td>
+                        <td><?= htmlspecialchars($commande["adresse"]) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</section>
+<?php require_once "footer.php"; ?>

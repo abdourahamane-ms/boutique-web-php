@@ -1,31 +1,45 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$nombrePanier = 0;
+
+if (isset($_SESSION["panier"])) {
+    $nombrePanier = array_sum($_SESSION["panier"]);
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovaShop - Boutique informatique</title>
+    <title>New-Tech Boutique</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="barre-haut">
-    <div class="conteneur navigation">
-        <a class="logo" href="index.php">Nova<span>Shop</span></a>
-
-        <nav class="menu">
+<header class="topbar">
+    <a class="logo" href="index.php">New<span>-Tech</span></a>
+    <nav>
+        <?php if (isset($_SESSION["user_id"])): ?>
             <a href="index.php">Boutique</a>
-            <a href="panier.php">Panier (<?php echo nombre_articles_panier(); ?>)</a>
-
-            <?php if (utilisateur_connecte()) { ?>
-                <a href="mes_commandes.php">Mes commandes</a>
-                <?php if (admin_connecte()) { ?>
-                    <a class="lien-admin" href="admin.php">Admin</a>
-                <?php } ?>
-                <a href="logout.php">Déconnexion</a>
-            <?php } else { ?>
-                <a class="bouton-menu" href="login.php">Connexion</a>
-            <?php } ?>
-        </nav>
-    </div>
+            <a href="panier.php">Panier (<?= $nombrePanier ?>)</a>
+            <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
+                <a href="admin.php">Admin</a>
+            <?php endif; ?>
+            <a href="logout.php">Deconnexion</a>
+        <?php else: ?>
+            <a href="login.php">Connexion</a>
+            <a href="register.php">Inscription</a>
+        <?php endif; ?>
+    </nav>
 </header>
 
-<main class="conteneur">
+<?php if (isset($_SESSION["message"])): ?>
+    <div class="message">
+        <?= htmlspecialchars($_SESSION["message"]) ?>
+    </div>
+    <?php unset($_SESSION["message"]); ?>
+<?php endif; ?>
+
+<main class="container">

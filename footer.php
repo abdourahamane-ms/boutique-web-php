@@ -1,9 +1,6 @@
 </main>
-
-<footer class="pied-page">
-    <div class="conteneur">
-        <p>NovaShop - projet PHP/MySQL réalisé pour m'entraîner sur une boutique en ligne simple.</p>
-    </div>
+<footer class="footer">
+    <p>&copy; 2026 New-Tech - Projet PHP et MySQL.</p>
 </footer>
 </body>
 </html>
