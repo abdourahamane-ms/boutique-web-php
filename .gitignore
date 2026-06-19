@@ -1,16 +1,5 @@
-# Fichiers locaux
-*.log
-*.tmp
 .DS_Store
 Thumbs.db
-
-# Dossiers d'outils / IDE
-.vscode/
-.idea/
-
-# Sauvegardes locales
-backup/
-sauvegarde/
-
-# Fichiers de configuration locale si besoin plus tard
+*.log
 .env
+.vscode/

@@ -1,64 +1,74 @@
-# NovaShop - boutique web PHP/MySQL
+# NovaShop - boutique PHP/MySQL
 
-NovaShop est une boutique en ligne que j'ai realisee pour m'entrainer sur les bases du developpement web : HTML, CSS, PHP et MySQL.
+NovaShop est une boutique en ligne fictive que j'ai réalisée pour m'entraîner avec les bases du développement web : HTML, CSS, PHP et MySQL.
 
-Je voulais eviter de faire seulement une page qui affiche des produits. J'ai donc ajoute un vrai parcours plus proche d'un site e-commerce : recherche dans le catalogue, fiche produit, panier, commande, espace client et petite interface administrateur.
+J'ai volontairement gardé une structure simple. Le projet ne contient pas de JavaScript, pas de framework et pas de bibliothèque externe. L'objectif est d'avoir un site qui ressemble à une vraie petite boutique, tout en restant compréhensible avec mon niveau actuel.
 
-## Fonctionnalites
+## Ce que l'on peut faire sur le site
 
-Cote client :
+- consulter un catalogue de produits ;
+- rechercher un produit ;
+- filtrer par catégorie ;
+- trier les produits par nom ou par prix ;
+- voir la fiche détaillée d'un produit ;
+- ajouter des produits au panier ;
+- modifier les quantités du panier ;
+- créer un compte client ;
+- se connecter ;
+- valider une commande simple ;
+- consulter ses commandes ;
+- gérer les produits et les commandes depuis une page administrateur.
 
-- affichage d'un catalogue de produits depuis la base MySQL ;
-- recherche par mot-cle ;
-- filtre par categorie ;
-- tri par prix ou par nom ;
-- fiche detaillee pour chaque produit ;
-- panier en session PHP ;
-- modification des quantites ;
-- validation d'une commande avec adresse de livraison ;
-- historique des commandes dans l'espace client.
-
-Cote administrateur :
-
-- tableau de bord simple ;
-- ajout d'un produit ;
-- modification d'un produit ;
-- masquage d'un produit ;
-- suivi des commandes ;
-- modification du statut d'une commande.
-
-## Technologies utilisees
+## Technologies utilisées
 
 - HTML
 - CSS
-- PHP procedural
-- MySQL
-- SQL
-- un petit script Python basique dans le dossier `scripts`, seulement pour montrer comment je peux preparer/verifier des donnees simples
+- PHP procédural
+- MySQL / SQL
+- un petit script Python basique pour vérifier une liste de produits
 
-Il n'y a pas de JavaScript, pas de framework PHP et pas de librairie externe. Le but etait de rester sur des notions que je sais expliquer.
+Le fichier Python est dans le dossier `scripts`. Il ne fait pas fonctionner le site. C'est juste un petit outil séparé pour m'entraîner avec les listes, les dictionnaires, les boucles et les conditions.
+
+## Organisation du projet
+
+```text
+index.php              catalogue et page d'accueil
+produit.php            fiche d'un produit
+panier.php             panier et validation de commande
+login.php              connexion et inscription
+logout.php             déconnexion
+mes_commandes.php      commandes du client connecté
+admin.php              page administrateur simple
+connexion.php          connexion MySQL + petites fonctions utiles
+header.php             haut du site
+footer.php             bas du site
+style.css              design du site
+database.sql           base de données
+scripts/               petit script Python séparé
+images/                images SVG des produits
+```
+
+Les petites fonctions PHP sont dans `connexion.php` pour éviter d'avoir un fichier `fonctions.php` séparé. J'ai fait ce choix pour garder la logique proche d'un petit projet PHP classique.
 
 ## Installation en local
 
-1. Placer le dossier du projet dans `htdocs` si vous utilisez XAMPP, ou dans le dossier web de votre serveur local.
-2. Creer la base de donnees avec le fichier `database.sql`.
-3. Verifier les informations de connexion dans `connexion.php`.
-4. Lancer le site depuis le navigateur.
+1. Copier le projet dans le dossier `htdocs` de XAMPP.
+2. Ouvrir phpMyAdmin.
+3. Importer le fichier `database.sql`.
+4. Lancer Apache et MySQL dans XAMPP.
+5. Ouvrir le site avec :
 
-Par defaut, la base s'appelle :
+```text
+http://localhost/boutique-web-php/
+```
 
-```sql
+La base de données s'appelle :
+
+```text
 boutique_web_php
 ```
 
-## Comptes de demonstration
-
-Compte client :
-
-```text
-Email : client@novashop.test
-Mot de passe : client123
-```
+## Comptes de test
 
 Compte administrateur :
 
@@ -67,32 +77,13 @@ Email : admin@novashop.test
 Mot de passe : admin123
 ```
 
-## Organisation rapide
+Compte client :
 
 ```text
-index.php                  page d'accueil et catalogue
-produit.php                detail d'un produit
-panier.php                 panier client
-paiement.php               validation de commande simulee
-compte.php                 espace client
-admin.php                  tableau de bord admin
-admin_produits.php         gestion des produits
-admin_commandes.php        gestion des commandes
-connexion.php              connexion a MySQL
-functions.php              petites fonctions utiles
-database.sql               structure et donnees de test
-style.css                  design du site
+Email : client@novashop.test
+Mot de passe : client123
 ```
 
-## Ce que ce projet m'a fait travailler
+## Limites du projet
 
-- les formulaires HTML relies a PHP ;
-- les sessions PHP pour le panier et la connexion ;
-- les requetes preparees avec PDO ;
-- la relation entre plusieurs tables SQL ;
-- l'organisation d'un projet web simple ;
-- la difference entre une page de test et une interface utilisable.
-
-## Limites connues
-
-Le paiement est volontairement simule. Le projet n'est pas connecte a un vrai service bancaire et il n'y a pas encore d'envoi d'email automatique. Pour un vrai site en production, il faudrait ajouter plus de securite, des tests et un vrai systeme de paiement.
+Le paiement est simulé. Il n'y a pas de vrai paiement bancaire, pas d'envoi d'email et pas de tableau de bord avancé. Le projet sert surtout à montrer que je sais relier des pages PHP avec une base MySQL et organiser un petit parcours e-commerce.

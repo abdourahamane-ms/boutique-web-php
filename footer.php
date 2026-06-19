@@ -1,13 +1,8 @@
 </main>
 
-<footer class="footer">
-    <div>
-        <h3>NovaShop</h3>
-        <p>Boutique e-commerce realisee en HTML, CSS, PHP et MySQL.</p>
-    </div>
-    <div>
-        <p>Projet personnel pour progresser en developpement web.</p>
-        <p class="petit">Paiement simule : aucune vraie transaction bancaire.</p>
+<footer class="pied-page">
+    <div class="conteneur">
+        <p>NovaShop - projet PHP/MySQL réalisé pour m'entraîner sur une boutique en ligne simple.</p>
     </div>
 </footer>
 </body>

@@ -1,7 +1,6 @@
 <?php
-require_once 'functions.php';
+require_once 'connexion.php';
 session_destroy();
-session_start();
-message('Vous etes deconnecte.');
-rediriger('login.php');
+header('Location: index.php');
+exit;
 ?>

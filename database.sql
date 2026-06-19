@@ -1,44 +1,45 @@
-DROP DATABASE IF EXISTS boutique_web_php;
-CREATE DATABASE boutique_web_php CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS boutique_web_php CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE boutique_web_php;
+
+DROP TABLE IF EXISTS ligne_commande;
+DROP TABLE IF EXISTS commande;
+DROP TABLE IF EXISTS produit;
+DROP TABLE IF EXISTS categorie;
+DROP TABLE IF EXISTS utilisateur;
 
 CREATE TABLE utilisateur (
     id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(120) NOT NULL,
+    nom VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     mot_de_passe VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'client',
-    date_creation DATETIME NOT NULL
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE categorie (
     id_categorie INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(80) NOT NULL
+    nom VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE produit (
     id_produit INT AUTO_INCREMENT PRIMARY KEY,
-    id_categorie INT NOT NULL,
-    nom VARCHAR(120) NOT NULL,
-    description TEXT NOT NULL,
+    nom VARCHAR(150) NOT NULL,
+    description TEXT,
     prix DECIMAL(10,2) NOT NULL,
-    image VARCHAR(255) DEFAULT '',
     stock INT NOT NULL DEFAULT 0,
-    actif TINYINT(1) NOT NULL DEFAULT 1,
-    date_ajout DATETIME NOT NULL,
+    image VARCHAR(255) DEFAULT 'images/produit-defaut.svg',
+    id_categorie INT,
+    actif TINYINT(1) DEFAULT 1,
     FOREIGN KEY (id_categorie) REFERENCES categorie(id_categorie)
 );
 
 CREATE TABLE commande (
     id_commande INT AUTO_INCREMENT PRIMARY KEY,
     id_utilisateur INT NOT NULL,
-    date_commande DATETIME NOT NULL,
     total DECIMAL(10,2) NOT NULL,
-    nom_livraison VARCHAR(120) NOT NULL,
-    adresse TEXT NOT NULL,
-    telephone VARCHAR(30) NOT NULL,
-    mode_paiement VARCHAR(60) NOT NULL,
-    statut VARCHAR(40) NOT NULL,
+    adresse_livraison TEXT,
+    statut VARCHAR(50) DEFAULT 'En préparation',
+    date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
 
@@ -46,30 +47,26 @@ CREATE TABLE ligne_commande (
     id_ligne INT AUTO_INCREMENT PRIMARY KEY,
     id_commande INT NOT NULL,
     id_produit INT NOT NULL,
-    nom_produit VARCHAR(120) NOT NULL,
     quantite INT NOT NULL,
     prix_unitaire DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (id_commande) REFERENCES commande(id_commande),
     FOREIGN KEY (id_produit) REFERENCES produit(id_produit)
 );
 
-INSERT INTO utilisateur (nom, email, mot_de_passe, role, date_creation) VALUES
-('Administrateur NovaShop', 'admin@novashop.test', '$2y$12$XWHOGx/IKkvLntINZaCskeiHAiSvmwAcEws1vV5kvQ4C/vuj1dMQG', 'admin', NOW()),
-('Client Demo', 'client@novashop.test', '$2y$12$XA.GBvGZE1ujZY49aOXEaOUn6HrOSKr3jdWZ3uQjC/T/trqUTUR.W', 'client', NOW());
-
-INSERT INTO categorie (nom) VALUES
+INSERT INTO categorie(nom) VALUES
 ('Ordinateurs'),
 ('Accessoires'),
 ('Audio'),
-('Bureau'),
-('Gaming');
+('Bureau');
 
-INSERT INTO produit (id_categorie, nom, description, prix, image, stock, actif, date_ajout) VALUES
-(1, 'PC portable NovaBook 14', 'Ordinateur portable leger pour les cours, le travail et la navigation quotidienne. Il convient a un usage etudiant avec traitement de texte, recherches internet et petits projets de programmation.', 629.90, 'images/pc-portable.svg', 9, 1, NOW()),
-(5, 'Pack gaming Starter', 'Pack compose d un clavier, d une souris et d un tapis. Il est pense pour demarrer avec un poste de jeu simple et propre sans depenser trop.', 89.90, 'images/pack-gaming.svg', 15, 1, NOW()),
-(2, 'Clavier mecanique Compact', 'Clavier compact avec touches confortables. Pratique pour garder de la place sur le bureau et coder plus facilement.', 49.90, 'images/clavier.svg', 24, 1, NOW()),
-(2, 'Souris sans fil Pulse', 'Souris sans fil simple, precise et agreable pour travailler longtemps. Bonne option pour un ordinateur portable.', 24.90, 'images/souris.svg', 32, 1, NOW()),
-(3, 'Casque audio Study Pro', 'Casque confortable avec micro integre pour les cours en ligne, les reunions et les appels.', 59.90, 'images/casque.svg', 18, 1, NOW()),
-(4, 'Support ordinateur Alu', 'Support de bureau pour surelever un ordinateur portable et ameliorer la position de travail.', 34.90, 'images/support.svg', 21, 1, NOW()),
-(4, 'Lampe LED Bureau', 'Lampe LED simple avec plusieurs niveaux de luminosite. Utile pour travailler le soir sans fatiguer les yeux.', 29.90, 'images/lampe.svg', 12, 1, NOW()),
-(3, 'Enceinte Bluetooth Mini', 'Petite enceinte portable pour ecouter de la musique dans une chambre ou un petit bureau.', 39.90, 'images/enceinte.svg', 16, 1, NOW());
+INSERT INTO utilisateur(nom, email, mot_de_passe, role) VALUES
+('Administrateur NovaShop', 'admin@novashop.test', '$2y$12$9zGW85GxUkVX/.5pxx0OIepHtutMhxt9t8kjSFFgMdd9BAgaSmTK6', 'admin'),
+('Client Test', 'client@novashop.test', '$2y$12$8/VjXYV9zRXTZT9IJuFWweX9XFt8tCr9AoqpTyXURExPMrJQAdKrW', 'client');
+
+INSERT INTO produit(nom, description, prix, stock, image, id_categorie, actif) VALUES
+('PC portable NovaBook 14', 'Ordinateur portable simple pour les cours, le web et les projets étudiants.', 629.90, 8, 'images/pc-portable.svg', 1, 1),
+('Pack gaming Starter', 'Pack clavier, souris et tapis pour commencer une petite installation gaming.', 89.90, 15, 'images/pack-gaming.svg', 2, 1),
+('Clavier mécanique Compact', 'Clavier compact confortable pour coder, rédiger et travailler.', 49.90, 20, 'images/clavier.svg', 2, 1),
+('Souris sans fil Pulse', 'Souris légère et pratique pour un ordinateur portable.', 24.90, 30, 'images/souris.svg', 2, 1),
+('Casque audio Study Pro', 'Casque audio adapté aux appels, aux cours en ligne et à la musique.', 59.90, 12, 'images/casque.svg', 3, 1),
+('Lampe de bureau LED', 'Lampe simple pour travailler le soir sans fatiguer les yeux.', 34.90, 10, 'images/lampe.svg', 4, 1);
