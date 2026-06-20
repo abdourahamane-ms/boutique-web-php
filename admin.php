@@ -96,7 +96,6 @@ require_once "header.php";
         <h2>Resume</h2>
         <p><strong><?= count($produits) ?></strong> produits dans la boutique.</p>
         <p><strong><?= count($commandes) ?></strong> commandes enregistrees.</p>
-        <p>Cette page reste volontairement simple pour pouvoir etre expliquee facilement.</p>
     </div>
 </section>
 
